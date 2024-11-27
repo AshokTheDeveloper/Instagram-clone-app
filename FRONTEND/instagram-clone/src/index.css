@@ -1,0 +1,14 @@
+:root {
+  /* background: #242424; */
+  background: #ffffff;
+  color: #000000;
+  /* color: #ffffff; */
+  font-family: Arial;
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  transition: width: 0.3s ease-in-out;
+}

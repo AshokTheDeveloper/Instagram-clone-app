@@ -1,0 +1,12 @@
+.home-bg-container {
+  display: flex;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  margin-left: 244px;
+}
