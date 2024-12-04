@@ -59,10 +59,87 @@ const logout = (req, res) => {
   });
 };
 
-const getUsers = async (req, res) => {
+const homePosts = async (req, res) => {
+  const { id } = req.user;
   try {
     const db = await dbPromise;
-    const getUsersQuery = `SELECT * FROM users`;
+    const getHomePostsQuery = `
+    SELECT
+      post.id AS post_id,
+      users.id AS user_id,
+      users.fullname AS full_name,
+      users.username AS username,
+      follow.created_at,
+      post.image_url,
+      post.caption
+    FROM
+      post
+    JOIN follow ON post.user_id = follow.following_id
+    JOIN users ON post.user_id = users.id
+    WHERE
+      follow.follower_id = ${id};
+  `;
+
+    const dbHomePosts = await db.all(getHomePostsQuery);
+
+    if (!dbHomePosts || dbHomePosts.length === 0) {
+      return res.status(404).json({ message: "No posts found" });
+    }
+
+    return res.status(200).json({ posts: dbHomePosts });
+  } catch (error) {
+    console.error("Error fetching home posts:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const post = async (req, res) => {
+  const { imageUrl, caption } = req.body;
+  const { id } = req.user;
+  try {
+    const db = await dbPromise;
+    const findUser = `SELECT * FROM users WHERE id = '${id}'`;
+    const dbUser = await db.get(findUser);
+    if (!dbUser) {
+      return res.status(401).json({ message: "Unauthorized user" });
+    }
+
+    const createPostQuery = `
+      INSERT INTO
+        post(caption, image_url, user_id)
+      VALUES
+        ('${caption}', '${imageUrl}', '${id}')
+      `;
+    await db.run(createPostQuery);
+    return res.status(201).json({ message: "Post created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("Internal server error: ", error.message);
+  }
+};
+
+const profileUser = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const db = await dbPromise;
+    const findUserQuery = `SELECT id, username, fullname FROM users WHERE id = '${id}'`;
+    const dbUser = await db.get(findUserQuery);
+    if (!dbUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ profile_user: dbUser });
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getUsers = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const db = await dbPromise;
+    const getUsersQuery = `SELECT id, username FROM users WHERE id <> '${id}'`;
     const users = await db.all(getUsersQuery);
     return res.status(200).json({ users: users });
   } catch (error) {
@@ -70,4 +147,49 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, getUsers, logout };
+const userProfilePosts = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const db = await dbPromise;
+    const findUserQuery = `SELECT * FROM users WHERE id = '${id}'`;
+    const dbUser = await db.get(findUserQuery);
+    if (!dbUser) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    const userPostsQuery = `SELECT * FROM post WHERE user_id = '${id}'`;
+    const userPosts = await db.all(userPostsQuery);
+    return res.status(200).json({ posts: userPosts });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const followUser = async (req, res) => {
+  const { userId } = req.body;
+  const { id } = req.user;
+  console.log("Logged-in user ID: ", id);
+  try {
+    const db = await dbPromise;
+    const followUserQuery = `
+        INSERT INTO follow (follower_id, following_id)
+        VALUES ('${id}', '${userId}')
+      `;
+
+    await db.run(followUserQuery);
+    res.status(200).json({ message: "User followed successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  signup,
+  login,
+  homePosts,
+  getUsers,
+  profileUser,
+  logout,
+  post,
+  userProfilePosts,
+  followUser,
+};

@@ -239,7 +239,11 @@
 }
 
 .profile-posts {
-  background: lightgray;
-  min-height: 100vh;
-  bottom-bottom: 120px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  max-width: 1002px;
+  margin: 0 auto;
+  padding: 0;
+  align-content: start;
 }

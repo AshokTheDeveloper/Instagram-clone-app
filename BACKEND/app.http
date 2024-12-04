@@ -4,3 +4,14 @@ POST http://localhost:3002/users/login
 	"email": "ashok@gmail.com",
 	"password": "123456"
 }
+
+
+###
+POST http://localhost:3002/users/posts/create-post
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzMDcyOTA2LCJleHAiOjE3MzM2Nzc3MDZ9.B5h0rMp3g5yMAIFJaMa_W0xxS852_ZvP_D4tPg7mz14
+
+{
+	"caption": "hello",
+	"imageUrl": "asfawoeruierj"
+}

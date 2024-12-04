@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./post.css";
 import { LuDot } from "react-icons/lu";
 import { BsThreeDots } from "react-icons/bs";
 import { FaRegHeart } from "react-icons/fa";
@@ -8,8 +7,10 @@ import { FiMessageCircle } from "react-icons/fi";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { CiFaceSmile } from "react-icons/ci";
 import EmojiPicker from "emoji-picker-react";
+import "./post.css";
 
-const Post = () => {
+
+const Post = (props) => {
   const [commentInput, setCommentInput] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -25,6 +26,7 @@ const Post = () => {
   const handleEmojiPicker = () => {
     setShowEmojiPicker((prev) => !prev);
   };
+
 
   const emojiPicker = () => (
     <div className="emoji-input-container">
@@ -43,6 +45,8 @@ const Post = () => {
     </div>
   );
 
+  const { postDetails } = props;
+  const { username, imageUrl, caption } = postDetails;
   return (
     <li className="post-bg-container">
       <div className="post-top-section-container">
@@ -58,7 +62,7 @@ const Post = () => {
           </div>
           <div className="username-nation-status-container">
             <div className="post-username-nation">
-              <p className="post-username">asdev</p>
+              <p className="post-username">{username}</p>
               <p className="post-user-nation">India</p>
             </div>
             <LuDot />
@@ -72,11 +76,7 @@ const Post = () => {
         </button>
       </div>
       <div className="post-container">
-        <img
-          src="https://res.cloudinary.com/dmui27xl3/image/upload/v1731664300/MY%20API%20IMAGES/ws7ozztuxhc7x6orlvdh.jpg"
-          alt="post image"
-          className="posts-post-image"
-        />
+        <img src={imageUrl} alt="post image" className="posts-post-image" />
       </div>
       <div className="post-like-comment-share-icons-container">
         <div>
@@ -102,11 +102,8 @@ const Post = () => {
         <p className="posts-likes-counter">{200} likes</p>
       </div>
       <div className="username-caption-container">
-        <Link className="post-caption-username">beautifulsoulsinnyc</Link>
-        <span className="post-caption">
-          this is why we are not trying to convince the most effective chance of
-          getting things
-        </span>
+        <Link className="post-caption-username">{username}</Link>
+        <span className="post-caption">{caption}</span>
       </div>
       <div className="post-comments-container">
         <input

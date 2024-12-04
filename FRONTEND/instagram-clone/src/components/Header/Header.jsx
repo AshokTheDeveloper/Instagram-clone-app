@@ -14,12 +14,12 @@ import { FiInstagram, FiPlusSquare, FiSun } from "react-icons/fi";
 import { LuPlaySquare } from "react-icons/lu";
 import { MdVideocam } from "react-icons/md";
 import { SlGraph } from "react-icons/sl";
-import Popup from "reactjs-popup";
 import { RxCross2 } from "react-icons/rx";
 import { RxCrossCircled } from "react-icons/rx";
 import { RiSettings2Line, RiMessengerLine } from "react-icons/ri";
 import { LuActivitySquare } from "react-icons/lu";
 import { TbMessageReport } from "react-icons/tb";
+import Popup from "reactjs-popup";
 
 import "./header.css";
 
@@ -28,29 +28,133 @@ const Header = () => {
 
   const [showSearch, setShowSearch] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  // const [showNotifications, setShowNotifications] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [post, setPost] = useState("");
+  const [createCaption, setCreateCaption] = useState(false);
+  const [openCaption, setOpenCaption] = useState(false);
+  const [postedImage, setPostedImage] = useState("");
+  const [captionText, setCaptionText] = useState("");
+  const [open, setOpen] = useState(false);
+  const [posted, setPosted] = useState(false);
 
   useEffect(() => {
     initiateUploadPostApi();
   }, [post]);
 
-  // Upload API should be implemented tomorrow
-  const initiateUploadPostApi = () => {
-    const preset = "insta-project";
-    const cloudName = "dmui27xl3";
-    const postData = new FormData();
-    postData.append("file", post);
-    postData.append("upload_preset", preset);
-    postData.append("cloud_name", cloudName);
-    const apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+  const onCaptionInputChange = (event) => {
+    setCaptionText(event.target.value);
+  };
+
+  const createPostCaption = () => {
+    setCreateCaption((prevState) => !prevState);
+  };
+
+  const onClickNextHandle = () => {
+    setOpenCaption((prevState) => !prevState);
+  };
+
+  const onSuccessfulPosting = () => {
+    setPosted(true);
+  };
+
+  const onClickShareHandle = async () => {
+    if (!postedImage || !captionText) {
+      return;
+    }
+
+    const newPost = {
+      imageUrl: postedImage,
+      caption: captionText,
+    };
+
+    console.log("Post: ", newPost);
+
+    const apiUrl = "http://localhost:3002/users/posts/create-post";
+    const jwtToken = Cookies.get("jwt_token");
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(newPost),
+    };
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        onSuccessfulPosting();
+      }
+    } catch (error) {
+      console.log("Failed to post", error.message);
+    }
+  };
+
+  // Post
+  const onHandleCreatePopup = () => {
+    setShowCreate((prevState) => !prevState);
+  };
+
+  const onClickCreate = () => {
+    setShowCreate((prevState) => !prevState);
+  };
+
+  // Upload post
+  const handleFileInput = (event) => {
+    setPost(event.target.files[0]);
+  };
+
+  // More popup
+  const onHandleMoreOptions = () => {
+    setShowMore((prevState) => !prevState);
+  };
+
+  // Search
+  const onHeaderChange = () => {
+    setShowSearch((prevState) => !prevState);
   };
 
   // Logout
   const onLogoutHandle = () => {
     Cookies.remove("jwt_token");
     navigate("/login");
+  };
+
+  // Upload API should be implemented tomorrow
+  const initiateUploadPostApi = async () => {
+    if (!post) {
+      return;
+    }
+    const preset = "insta-project";
+    const cloudName = "dmui27xl3";
+
+    const postData = new FormData();
+
+    postData.append("file", post);
+    postData.append("upload_preset", preset);
+    postData.append("cloud_name", cloudName);
+
+    const apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+    const options = {
+      method: "POST",
+      body: postData,
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        setPostedImage(data.secure_url);
+        createPostCaption();
+        console.log(data);
+      }
+      setPost("");
+    } catch (error) {
+      console.log("Error on uploading post image: ", error.message);
+    }
   };
 
   // Search popup
@@ -78,78 +182,156 @@ const Header = () => {
     </div>
   );
 
-  // Search
-  const onHeaderChange = () => {
-    setShowSearch(!showSearch);
+  const onHandle = async () => {
+    setOpen((prevState) => !prevState);
+    setShowCreate(false);
   };
 
-  //
-  const handleFileInput = (event) => {
-    setPost(event.target.files[0]);
+  const onClosePostedPopup = () => {
+    setOpen((prevState) => !prevState);
+    setShowCreate(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 10);
   };
 
-  // create post Popup
-  const onClickCreatePost = () => (
-    <Popup
-      trigger={
-        <button className="post-create-button">
-          Post
-          <LuPlaySquare className="post-icon" />
-        </button>
-      }
-      modal
-      onClick={onHandleCreatePopup}
-    >
-      {(close) => (
-        <div className="post-popup-modal-container">
-          <button className="post-popup-close-button" onClick={() => close()}>
-            <RxCross2 className="popup-icon" />
-          </button>
-          <div className="upload-post-container">
-            <div className="create-new-post-text-container">
-              <p className="create-new-post-text">Create new post</p>
-            </div>
-            <div className="upload-create-post-container">
+  const renderPosting = () => (
+    <div className="create-modal-container" onClick={onHandle}>
+      <div
+        className="post-popup-modal-container"
+        onClick={(e) => {
+          e.stopPropagation();
+        }} // Prevents event bubbling
+      >
+        <div
+          className={`upload-post-container ${
+            openCaption ? "create-post-caption-container" : ""
+          } `}
+        >
+          <div className="create-new-post-text-container">
+            <p className="create-new-post-text">Create new post</p>
+            {openCaption
+              ? createCaption && (
+                  <button
+                    className="post-next-button"
+                    onClick={onClickShareHandle}
+                  >
+                    Share
+                  </button>
+                )
+              : createCaption && (
+                  <button
+                    className="post-next-button"
+                    onClick={onClickNextHandle}
+                  >
+                    Next
+                  </button>
+                )}
+          </div>
+          {createCaption ? (
+            <div className="caption-container">
               <img
-                src="https://res.cloudinary.com/dmui27xl3/image/upload/v1732557089/LOGOS/Group_7_11zon_julzr8.png"
-                alt="post icon"
-                className="upload-image"
+                src={postedImage}
+                alt="post_image"
+                className="posted-image"
               />
-              <p className="upload-post-text">Drag photos and videos here</p>
-              <label htmlFor="uploadingImage" className="file-input-label">
-                Select from computer
-              </label>
-              <input
-                id="uploadingImage"
-                type="file"
-                className="file-input"
-                onChange={handleFileInput}
-              />
+              {openCaption && (
+                <div className="post-right-section-container">
+                  <div className="post-caption-username-container">
+                    <IoPersonCircleOutline className="post-caption-icons" />
+                    <p className="post-caption-user-text">AsDev.</p>
+                  </div>
+                  <textarea
+                    type="textarea"
+                    rows={10}
+                    cols={40}
+                    value={captionText}
+                    onChange={onCaptionInputChange}
+                    className="caption-text-input"
+                  ></textarea>
+                </div>
+              )}
             </div>
+          ) : (
+            !openCaption && (
+              <>
+                <div className="upload-create-post-container">
+                  <img
+                    src="https://res.cloudinary.com/dmui27xl3/image/upload/v1733067716/LOGOS/Group_7_11zon_julzr8_11zon_s1bdff.png"
+                    alt="post icon"
+                    className="upload-image"
+                  />
+                  <p className="upload-post-text">
+                    Drag photos and videos here
+                  </p>
+                  <label htmlFor="uploadingImage" className="file-input-label">
+                    Select from computer
+                  </label>
+                  <input
+                    id="uploadingImage"
+                    type="file"
+                    className="file-input"
+                    onChange={handleFileInput}
+                  />
+                </div>
+              </>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPosted = () => (
+    <div className="create-modal-container" onClick={onHandle}>
+      <div
+        className="post-popup-modal-container"
+        onClick={(e) => {
+          e.stopPropagation();
+        }} // Prevents event bubbling
+      >
+        <div className="upload-post-container">
+          <p className="create-new-posted-text">Post shared</p>
+          <div className="posted-text-container">
+            <img
+              src="https://res.cloudinary.com/dmui27xl3/image/upload/v1733128271/LOGOS/insta_posted_vley2t.png"
+              alt="posted icon"
+              className="posted-icon"
+            />
+            <p>Your post has been shared</p>
           </div>
         </div>
-      )}
-    </Popup>
+      </div>
+    </div>
+  );
+
+  // create post Popup
+  const custom = () => (
+    <>
+      <button className="post-popup-close-button" onClick={onClosePostedPopup}>
+        <RxCross2 className="popup-icon" />
+      </button>
+
+      {posted ? renderPosted() : renderPosting()}
+    </>
   );
 
   const renderCreatePost = () => (
     <div className={`create-post-popup ${showCreate ? "create-popup" : ""}`}>
-      {onClickCreatePost()}
+      <button className="post-create-button" onClick={onHandle}>
+        <p>Post</p>
+        <LuPlaySquare className="post-icon" />
+      </button>
       <button className="post-create-button" onClick={onHandleCreatePopup}>
         <p>Live</p>
         <MdVideocam className="post-icon" />
       </button>
-      <button className="post-create-button">
+      <button className="post-create-button" onClick={onHandleCreatePopup}>
         <p>Ad</p>
         <SlGraph className="post-icon" />
       </button>
     </div>
   );
-
-  // More popup
-  const onHandleMoreOptions = () => {
-    setShowMore(!showMore);
-  };
 
   const renderMoreOptions = () => (
     <div className="more-options-bg-container">
@@ -199,15 +381,6 @@ const Header = () => {
       </div>
     </div>
   );
-
-  // Post
-  const onHandleCreatePopup = () => {
-    setShowCreate(!showCreate);
-  };
-
-  const onClickCreate = () => {
-    setShowCreate(!showCreate);
-  };
 
   const header = () => (
     <div className={`side-header ${showSearch ? "expanded" : ""}`}>
@@ -279,7 +452,8 @@ const Header = () => {
           <span className="search-text">Create</span>
         </div>
       </button>
-      {renderCreatePost()}
+      {showCreate && renderCreatePost()}
+      {open && custom()}
       <Link className="nav-item-container links" to="/user-profile">
         <div className="item">
           <IoPersonCircleOutline className="nav-icons" />

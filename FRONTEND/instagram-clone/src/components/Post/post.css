@@ -166,6 +166,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .comment-input {
@@ -189,10 +190,13 @@
   outline: none;
   color: #0095f6;
   cursor: pointer;
+  margin-right: 32px;
+  padding: 0;
 }
 
 .emoji-input-container {
-  position: relative;
+  position: absolute;
+  right: 0;
 }
 
 .emoji-icon {
@@ -202,7 +206,7 @@
 
 .emoji-container {
   position: absolute;
-  bottom: 100%;
-  left: 0;
-  z-index: 10;
+  bottom: 30px;
+  left: 10px;
 }
+
