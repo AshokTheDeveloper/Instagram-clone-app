@@ -1,0 +1,224 @@
+-- ####################### Create User ################################################
+-- CREATE TABLE user (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     username VARCHAR(250),
+--     gender VARCHAR(250),
+--     email VARCHAR(250),
+--     password VARCHAR(250),
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+-- );
+-- DROP TABLE user;
+-- INSERT INTO user (
+--     id, username, gender, email, password
+-- )
+-- VALUES
+--     (1, 'ashok', 'male', 'ashok@gmail.com', '123456'),
+--     (2, 'john', 'male', 'john@gmail.com', '123456'),
+--     (3, 'joe', 'female', 'joe@gmail.com', '123456'),
+--     (4, 'rahul', 'male', 'rahul@gmail.com', '123456'),
+--     (5, 'luke', 'male', 'luke@gmail.com', '123456'),
+--     (6, 'morgan', 'male', 'morgan@gmail.com', '123456'),
+--     (7, 'king', 'male', 'king@gmail.com', '123456'),
+--     (8, 'john_doe', 'male', 'john.doe@example.com', '123456'),
+--     (9, 'jane_smith', 'female', 'jane.smith@example.com', '123456'),
+--     (10, 'alex_king', 'male', 'alex.king@example.com', '123456'),
+--     (11, 'emma_brown', 'female', 'emma.brown@example.com', '123456'),
+--     (12, 'chris_lee', 'male', 'chris.lee@example.com', '123456'),
+--     (13, 'sophia_clark', 'female', 'sophia.clark@example.com', '123456'),
+--     (14, 'liam_davis', 'male', 'liam.davis@example.com', '123456'),
+--     (15, 'mia_wilson', 'female', 'mia.wilson@example.com', '123456'),
+--     (16, 'noah_jones', 'male', 'noah.jones@example.com', '123456'),
+--     (17, 'olivia_garcia', 'female', 'olivia.garcia@example.com', '123456'),
+--     (18, 'charlie_brown', 'male', 'charlie.brown@example.com', '123456'),
+--     (19, 'lucy_liu', 'female', 'lucy.liu@example.com', '123456'),
+--     (20, 'peter_parker', 'male', 'peter.parker@example.com', '123456'),
+--     (21, 'wanda_maximoff', 'female', 'wanda.maximoff@example.com', '123456'),
+--     (22, 'tony_stark', 'male', 'tony.stark@example.com', '123456'),
+--     (23, 'steve_rogers', 'male', 'steve.rogers@example.com', '123456'),
+--     (24, 'natasha_romanoff', 'female', 'natasha.romanoff@example.com', '123456'),
+--     (25, 'bruce_banner', 'male', 'bruce.banner@example.com', '123456'),
+--     (26, 'clint_barton', 'male', 'clint.barton@example.com', '123456'),
+--     (27, 'thor_odinson', 'male', 'thor.odinson@example.com', '123456'),
+--     (28, 'hawkeye', 'female', 'hawkeye@example.com', '123456'),
+--     (29, 'susan_stark', 'female', 'susan.stark@example.com', '123456'),
+--     (30, 'clark_kent', 'male', 'clark.kent@example.com', '123456');
+--###################################################################################
+-- ###################### Create Post ##############################################################
+-- CREATE TABLE post (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     caption TEXT,
+--     image_url TEXT,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     user_id INTEGER,
+--     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+-- );
+-- DROP TABLE post;
+-- INSERT INTO post (
+--     id, caption, image_url, user_id
+-- )
+-- VALUES (1, 'This is wonderful', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1714554364/Posts/xbiov9bxemyqogr22p7b.avif', 1),
+--  (2, 'The Universe', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1714657224/Posts/ksud8ibgimk7ixhsljbz.avif', 1),
+--  (3, 'I love take pictures', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1714657191/Posts/j6rjnbpjuirpsyehghq8.jpg', 2),
+--  (4, 'My move on', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1714554406/Posts/jqxumyiwxcxp8yoj2dpm.jpg', 2),
+--  (5, 'Rainy day', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1682574743/My%20village%20photos/IMG_20220708_151100_b2sboc.jpg', 5),
+--  (6, 'Green lands', 'https://res.cloudinary.com/dmui27xl3/image/upload/v1682574417/My%20village%20photos/IMG_20220708_150521_ovuu9e.jpg', 5),
+--  (7, 'Exploring the mountains!', 'https://example.com/images/mountain.jpg', 2),
+--  (8, 'Delicious homemade pasta.', 'https://example.com/images/pasta.jpg', 3),
+--  (9, 'Sunset by the beach.', 'https://example.com/images/sunset.jpg', 4),
+--  (10, 'Workout grind!', 'https://example.com/images/workout.jpg', 1),
+--  (11, 'Beautiful art gallery visit.', 'https://example.com/images/art.jpg', 5),
+--  (12, 'Coffee time at my favorite café.', 'https://example.com/images/coffee.jpg', 6),
+--  (13, 'Adventures in the city.', 'https://example.com/images/city.jpg', 7),
+--  (14, 'Nature photography at its best.', 'https://example.com/images/nature.jpg', 8),
+--  (15, 'Hiking trip success!', 'https://example.com/images/hiking.jpg', 2),
+--  (16, 'Yummy dessert recipe.', 'https://example.com/images/dessert.jpg', 3),
+--  (17, 'My new workspace setup!', 'https://example.com/images/workspace.jpg', 4),
+--  (18, 'Evening stroll in the park.', 'https://example.com/images/park.jpg', 1),
+--  (19, 'Weekend getaway vibes.', 'https://example.com/images/getaway.jpg', 5),
+--  (20, 'Book I’m currently reading.', 'https://example.com/images/book.jpg', 6),
+--  (21, 'Caught the perfect sunrise.', 'https://example.com/images/sunrise.jpg', 7),
+--  (22, 'Cooking experiments!', 'https://example.com/images/cooking.jpg', 8),
+--  (23, 'Chilling with friends.', 'https://example.com/images/friends.jpg', 2),
+--  (24, 'My latest sketch.', 'https://example.com/images/sketch.jpg', 3),
+--  (25, 'Road trip snapshots.', 'https://example.com/images/roadtrip.jpg', 4),
+--  (26, 'New recipe I tried today.', 'https://example.com/images/recipe.jpg', 1);
+-- #############################################################################################
+-- ###################### Create Like ##############################################################
+-- CREATE TABLE like (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     user_id INTEGER,
+--     post_id INTEGER,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+--     FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
+-- );
+-- DROP TABLE like
+-- INSERT INTO like (id, user_id, post_id)
+-- VALUES (1, 1, 1),
+--        (2, 1, 2),
+--        (3, 2, 1),
+--        (4, 2, 2),
+--        (5, 3, 1),
+--        (6, 3, 3),
+--        (7, 4, 3),
+--        (8, 4, 4),
+--        (9, 5, 4),
+--        (10, 5, 5),
+--        (11, 2, 7),
+--        (12, 3, 7),
+--        (13, 4, 8),
+--        (14, 1, 8),
+--        (15, 5, 9),
+--        (16, 6, 9),
+--        (17, 2, 10),
+--        (18, 3, 10),
+--        (19, 4, 11),
+--        (20, 1, 11),
+--        (21, 5, 12),
+--        (22, 6, 12),
+--        (23, 7, 13),
+--        (24, 8, 13),
+--        (25, 1, 14),
+--        (26, 3, 14),
+--        (27, 2, 15),
+--        (28, 4, 15),
+--        (29, 6, 16),
+--        (30, 8, 16);
+-- ##################################################################################################
+-- ###################### Create Comment ############################################################
+-- CREATE TABLE comment (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     content TEXT,
+--     user_id INTEGER,
+--     post_id INTEGER,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+--     FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
+-- );
+-- DROP TABLE comment;
+-- INSERT INTO comment (id, content, user_id, post_id)
+-- VALUES (1, 'Awesome buddy', 1, 1),
+--        (2, 'very nice', 1, 2),
+--        (3, 'cooooool!', 2, 1),
+--        (4, 'Crazy buddy', 2, 2),
+--        (5, 'Hello folks', 3, 3),
+--        (6, 'Waited and now present', 3, 4),
+--        (7, 'something missing?', 4, 3),
+--        (8, 'Like here who follows', 4, 4),
+--        (9, 'No one will match it', 5, 5),
+--        (10, 'Unbelievable one', 5, 4),
+--        (11, 'The one I wanted', 5, 1),
+--        (12, 'Have a good day buddy', 4, 2),
+--        (13, 'Amazing shot!', 2, 7),
+--        (14, 'Looks delicious!', 3, 8),
+--        (15, 'Wow, what a view!', 4, 9),
+--        (16, 'Great motivation!', 1, 10),
+--        (17, 'Love this artwork!', 5, 11),
+--        (18, 'Where is this café?', 6, 12),
+--        (19, 'The city looks beautiful.', 7, 13),
+--        (20, 'What camera did you use?', 8, 14),
+--        (21, 'I want to join next time!', 2, 15),
+--        (22, 'Can you share the recipe?', 3, 16),
+--        (23, 'This setup is goals!', 4, 17),
+--        (24, 'Nice place to relax.', 1, 18),
+--        (25, 'So peaceful!', 5, 19),
+--        (26, 'What book is that?', 6, 20),
+--        (27, 'Perfect shot!', 7, 13),
+--        (28, 'Looks like fun!', 8, 14),
+--        (29, 'What’s the trail name?', 2, 15),
+--        (30, 'Love the colors!', 3, 16),
+--        (31, 'Your sketches are amazing.', 4, 17),
+--        (32, 'Great capture!', 1, 18);
+-- #######################################################################################
+-- ##################### Create Follow ###################################################
+-- CREATE TABLE follow (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     follower_id INTEGER NOT NULL,
+--     following_id INTEGER NOT NULL,
+--     FOREIGN KEY (follower_id) REFERENCES user(id) ON DELETE CASCADE,
+--     FOREIGN KEY (following_id) REFERENCES user(id) ON DELETE CASCADE
+--     UNIQUE(follower_id, following_id)
+-- )
+-- DROP TABLE follow;
+-- INSERT INTO follow (id, follower_id, following_id)
+-- VALUES 
+--        (1, 1, 2),
+--        (2, 1, 3),
+--        (3, 1, 4),
+--        (4, 1, 5),
+--        (5, 2, 1),
+--        (6, 2, 3),
+--        (7, 2, 4),
+--        (8, 2, 5),
+--        (9, 3, 1),
+--        (10, 3, 2),
+--        (11, 3, 4),
+--        (12, 4, 1),
+--        (13, 4, 2),
+--        (14, 4, 5),
+--        (15, 5, 6),
+--        (16, 6, 7),
+--        (17, 7, 8),
+--        (18, 8, 1),
+-- #######################################################################################
+-- #################### Create Story #######################################################
+-- CREATE TABLE story (
+--     id INTEGER NOT NULL PRIMARY KEY,
+--     image_url TEXT,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     user_id INTEGER,
+--     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+-- );
+-- DROP TABLE story
+-- INSERT INTO story (id, image_url, user_id)
+-- VALUES (1, 'https://res.cloudinary.com/dmui27xl3/image/upload/v1732935659/IMAGES%20FOR%20TEST/pexels-jurate-cia-201791640-11633162_fffmf1.jpg', 1),
+--        (2, 'https://res.cloudinary.com/dmui27xl3/image/upload/v1732935625/IMAGES%20FOR%20TEST/pexels-gustavo-santana-3928789-5860549_sv8mok.jpg', 2),
+--        (3, 'https://res.cloudinary.com/dmui27xl3/image/upload/v1732935607/IMAGES%20FOR%20TEST/pexels-nelson-ribeiro-973316-2399641_myutka.jpg', 3),
+--        (4, 'https://res.cloudinary.com/dmui27xl3/image/upload/v1732935593/IMAGES%20FOR%20TEST/pexels-guimaraesm-4664301_bdpku7.jpg', 4),
+--        (5, 'https://res.cloudinary.com/dmui27xl3/image/upload/v1732935632/IMAGES%20FOR%20TEST/pexels-aysun-kahraman-oktem-3890106-5938110_ylsgfd.jpg', 5)
+-- SELECT * FROM user INNER JOIN story ON user.id = story.user_id
+-- WHERE user.id = 1;
+-- SELECT * FROM post INNER JOIN like ON post.user_id = like.user_id
+-- WHERE post.user_id = 2;

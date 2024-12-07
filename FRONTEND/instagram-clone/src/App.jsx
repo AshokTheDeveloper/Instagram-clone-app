@@ -10,6 +10,7 @@ import NotFound from "./components/NotFound/NotFound";
 import Explore from "./components/Explore/Explore";
 import Reels from "./components/Reels/Reels";
 import "./App.css";
+import UserProfile from "./components/UserProfile/UserProfile";
 
 function App() {
   const [authUser, setAuthUser] = useState(null);
@@ -56,6 +57,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            exact
+            path="/:name"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
               </ProtectedRoute>
             }
           />

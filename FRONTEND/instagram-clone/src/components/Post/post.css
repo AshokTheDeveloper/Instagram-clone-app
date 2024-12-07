@@ -52,8 +52,10 @@
   display: flex;
 }
 
-.post-username {
+.post-username-link {
   font-size: 14px;
+  text-decoration: none;
+  color: #000000;
 }
 
 .post-user-nation {
@@ -93,9 +95,10 @@
   align-items: center;
   max-height: 585px;
   max-width: 468px;
-  background: lightgray;
   overflow: hidden;
   margin-bottom: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 
 .posts-post-image {
@@ -129,6 +132,10 @@
 .posts-icons {
   width: 25px;
   height: 25px;
+}
+
+.liked-heart-icon {
+  color: rgba(255, 48, 64);
 }
 
 .posts-saved-image {
@@ -209,4 +216,3 @@
   bottom: 30px;
   left: 10px;
 }
-

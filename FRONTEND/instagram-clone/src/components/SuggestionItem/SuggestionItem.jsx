@@ -6,7 +6,7 @@ import "./suggestionitem.css";
 const SuggestionItem = (props) => {
   const { userDetails, followUser } = props;
   const { id, username } = userDetails;
-  // console.log(userDetails);
+
   const onClickFollow = () => {
     followUser(id);
   };

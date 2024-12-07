@@ -135,6 +135,23 @@ const profileUser = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const db = await dbPromise;
+    const findUserQuery = `SELECT id, username, fullname FROM users WHERE username = '${username}'`;
+    const dbUser = await db.get(findUserQuery);
+    if (!dbUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ user_profile: dbUser });
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getUsers = async (req, res) => {
   const { id } = req.user;
   try {
@@ -164,10 +181,26 @@ const userProfilePosts = async (req, res) => {
   }
 };
 
+const userPosts = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const db = await dbPromise;
+    const findUserQuery = `SELECT * FROM users WHERE username = '${username}'`;
+    const dbUser = await db.get(findUserQuery);
+    if (!dbUser) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    const userPostsQuery = `SELECT * FROM post WHERE user_id = '${dbUser.id}'`;
+    const userPosts = await db.all(userPostsQuery);
+    return res.status(200).json({ posts: userPosts });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const followUser = async (req, res) => {
   const { userId } = req.body;
   const { id } = req.user;
-  console.log("Logged-in user ID: ", id);
   try {
     const db = await dbPromise;
     const followUserQuery = `
@@ -182,14 +215,111 @@ const followUser = async (req, res) => {
   }
 };
 
+const commentPost = async (req, res) => {
+  const { id } = req.user;
+  const { postId, content } = req.body;
+  try {
+    const db = await dbPromise;
+    const commentPostQuery = `
+      INSERT INTO comment
+        (content, user_id, post_id)
+      VALUES ('${content}', '${id}', '${postId}')
+    `;
+    const dbComment = await db.run(commentPostQuery);
+    console.log(dbComment);
+
+    return res.status(201).json({ message: "Comment created" });
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getComments = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const db = await dbPromise;
+    const getCommentsQuery = `
+      SELECT 
+          comment.content, 
+          comment.created_at, 
+          users.email, 
+          users.fullname, 
+          comment.id, 
+          comment.post_id, 
+          comment.updated_at, 
+          comment.user_id, 
+          users.username
+      FROM comment 
+          JOIN users ON comment.user_id = users.id
+      WHERE comment.post_id = '${postId}'`;
+    const comments = await db.get(getCommentsQuery);
+    // if (!comments) {
+    //   res.status(404).json({ message: "No comments found" });
+    // }
+    return res.status(200).json({ comments: comments });
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const likePost = async (req, res) => {
+  const { id } = req.user;
+  const { postId } = req.body;
+  try {
+    const db = await dbPromise;
+    const likePostQuery = `
+    INSERT INTO
+      likes
+        (user_id, post_id)
+    VALUES ('${id}', '${postId}')`;
+    const post = await db.run(likePostQuery);
+    if (post.lastID) {
+      return res.status(201).json({ message: "Post liked" });
+    }
+
+    return res.status(201).json({ message: "Post liked" });
+  } catch (error) {
+    console.log("Internal server error", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const likesCount = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const db = await dbPromise;
+    const likesCountQuery = `
+    SELECT COUNT(*) AS likes_count
+    FROM likes
+    WHERE post_id = '${postId}'
+    `;
+    const likesCount = await db.get(likesCountQuery);
+    if (!likesCount) {
+      return res.status(401).json({ message: "Not likes found" });
+    }
+    return res.status(200).json({ likesCount: likesCount });
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
   homePosts,
   getUsers,
   profileUser,
+  getUser,
   logout,
   post,
   userProfilePosts,
+  userPosts,
   followUser,
+  commentPost,
+  getComments,
+  likePost,
+  likesCount,
 };

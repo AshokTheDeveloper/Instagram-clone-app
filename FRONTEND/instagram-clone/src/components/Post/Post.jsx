@@ -1,21 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 import { LuDot } from "react-icons/lu";
 import { BsThreeDots } from "react-icons/bs";
-import { FaRegHeart } from "react-icons/fa";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { CiFaceSmile } from "react-icons/ci";
 import EmojiPicker from "emoji-picker-react";
+import Comments from "../Comments/Comments";
 import "./post.css";
 
-
 const Post = (props) => {
+  const { postDetails } = props;
+  const { username, imageUrl, caption, id } = postDetails;
+
   const [commentInput, setCommentInput] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+
+  useEffect(() => {
+    getLikesCount();
+  }, []);
 
   const onHandleComment = (event) => {
     setCommentInput(event.target.value);
+  };
+
+  const onCommentApiHandle = async () => {
+    const newComment = {
+      postId: id,
+      content: commentInput,
+    };
+
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = "http://localhost:3002/users/post/comment";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(newComment),
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+      }
+    } catch (error) {
+      console.log("Response error: ", error.message);
+    }
+
+    setCommentInput("");
   };
 
   const handleEmojiClick = (emojiData) => {
@@ -26,7 +67,6 @@ const Post = (props) => {
   const handleEmojiPicker = () => {
     setShowEmojiPicker((prev) => !prev);
   };
-
 
   const emojiPicker = () => (
     <div className="emoji-input-container">
@@ -45,9 +85,67 @@ const Post = (props) => {
     </div>
   );
 
-  const { postDetails } = props;
-  const { username, imageUrl, caption } = postDetails;
-  return (
+  const onLikePostHandle = async () => {
+    const newLike = {
+      postId: id,
+    };
+
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = "http://localhost:3002/users/post/like";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(newLike),
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        setHasLiked(true);
+        setLikesCount((prevLikesCount) => prevLikesCount + 1);
+      } else {
+        console.log(data);
+      }
+    } catch (error) {
+      console.log("Response error: ", error.message);
+    }
+  };
+
+  // Likes count handle
+  const getLikesCount = async () => {
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = `http://localhost:3002/users/post/likes/${id}`;
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        if (data.likesCount.likes_count !== 0) {
+          setLikesCount(data.likesCount.likes_count);
+        }
+      } else {
+        console.log(data);
+      }
+    } catch (error) {
+      console.log("Error on likes count: ", error.message);
+    }
+  };
+
+  // console.log(likesCount);
+
+  const renderPost = () => (
     <li className="post-bg-container">
       <div className="post-top-section-container">
         <div className="post-profile-and-username-container">
@@ -62,7 +160,9 @@ const Post = (props) => {
           </div>
           <div className="username-nation-status-container">
             <div className="post-username-nation">
-              <p className="post-username">{username}</p>
+              <Link to={`/${username}`} className="post-username-link">
+                {username}
+              </Link>
               <p className="post-user-nation">India</p>
             </div>
             <LuDot />
@@ -80,8 +180,16 @@ const Post = (props) => {
       </div>
       <div className="post-like-comment-share-icons-container">
         <div>
-          <button className="post-bottom-section-button">
-            <FaRegHeart className="posts-icons" />
+          <button
+            className="post-bottom-section-button"
+            onClick={onLikePostHandle} // Like post handle
+          >
+            {hasLiked ? (
+              <GoHeartFill className="posts-icons liked-heart-icon" />
+
+            ) : (
+              <GoHeart className="posts-icons" />
+            )}
           </button>
           <button className="post-bottom-section-button">
             <FiMessageCircle className="posts-icons" />
@@ -99,11 +207,18 @@ const Post = (props) => {
         </button>
       </div>
       <div className="post-likes-count-container">
-        <p className="posts-likes-counter">{200} likes</p>
+        {likesCount > 0 && ( // likes count
+          <p className="posts-likes-counter">{likesCount} likes</p>
+        )}
       </div>
       <div className="username-caption-container">
-        <Link className="post-caption-username">{username}</Link>
+        <Link to={`/${username}`} className="post-caption-username">
+          {username}
+        </Link>
         <span className="post-caption">{caption}</span>
+      </div>
+      <div className="post-comments">
+        {<Comments postDetails={postDetails} />}
       </div>
       <div className="post-comments-container">
         <input
@@ -113,10 +228,7 @@ const Post = (props) => {
           onChange={onHandleComment}
         />
         {commentInput.trim().length > 0 && (
-          <button
-            className="posts-post-button"
-            onClick={() => setCommentInput("")}
-          >
+          <button className="posts-post-button" onClick={onCommentApiHandle}>
             Post
           </button>
         )}
@@ -124,6 +236,8 @@ const Post = (props) => {
       </div>
     </li>
   );
+
+  return <>{renderPost()}</>;
 };
 
 export default Post;
