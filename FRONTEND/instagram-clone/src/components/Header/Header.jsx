@@ -22,11 +22,14 @@ import { TbMessageReport } from "react-icons/tb";
 import Popup from "reactjs-popup";
 
 import "./header.css";
+import SearchUserItem from "../SearchUserItem/SearchUserItem";
 
 const Header = () => {
   const navigate = useNavigate();
 
   const [showSearch, setShowSearch] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   // const [showNotifications, setShowNotifications] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -41,6 +44,10 @@ const Header = () => {
   useEffect(() => {
     initiateUploadPostApi();
   }, [post]);
+
+  useEffect(() => {
+    searchUsersApiHandle();
+  }, [searchInput]);
 
   const onCaptionInputChange = (event) => {
     setCaptionText(event.target.value);
@@ -67,8 +74,6 @@ const Header = () => {
       imageUrl: postedImage,
       caption: captionText,
     };
-
-    console.log("Post: ", newPost);
 
     const apiUrl = "http://localhost:3002/users/posts/create-post";
     const jwtToken = Cookies.get("jwt_token");
@@ -157,6 +162,56 @@ const Header = () => {
     }
   };
 
+  const onSearchInputChange = (event) => {
+    setSearchInput(event.target.value);
+  };
+
+  const onClearSearchInput = () => {
+    setSearchInput("");
+  };
+
+  const searchUsersApiHandle = async () => {
+    if (searchInput.trim() === "") {
+      setSearchResult([]);
+      return;
+    }
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = `http://localhost:3002/users/search?query=${searchInput}`;
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        setSearchResult(data.users);
+      } else {
+        console.log("Error: ", data);
+      }
+    } catch (error) {
+      console.log("Error on search users: ", error.message);
+    }
+  };
+
+  const renderSearchResults = () => (
+    <>
+      {searchResult.length > 0 ? (
+        <ul className="search-user-items-container">
+          {searchResult.map((eachUser) => (
+            <SearchUserItem key={eachUser.id} userDetails={eachUser} />
+          ))}
+        </ul>
+      ) : (
+        <p>No results found</p>
+      )}
+    </>
+  );
+
   // Search popup
   const renderSearchContainer = () => (
     <div
@@ -167,17 +222,28 @@ const Header = () => {
       <div className="search-input-container">
         <h1 className="search-input-text">Search</h1>
         <div className="input-and-clear-button-container">
-          <input className="search-input" type="text" placeholder="Search" />
-          <button className="clear-result-button">
+          <input
+            className="search-input"
+            value={searchInput}
+            type="text"
+            placeholder="Search"
+            onChange={onSearchInputChange}
+          />
+          <button className="clear-result-button" onClick={onClearSearchInput}>
             <RxCrossCircled className="clear-result-icon" />
           </button>
         </div>
       </div>
       <div className="search-results-container">
-        <h1 className="search-results-recent-text">Recent</h1>
-        <div className="search-results">
-          <h1 className="no-search-results-text">No recent searches.</h1>
-        </div>
+        {!searchInput && (
+          <div>
+            <h1 className="search-results-recent-text">Recent</h1>
+            <div className="search-results">
+              <h1 className="no-search-results-text">No recent searches.</h1>
+            </div>
+          </div>
+        )}
+        {searchInput.length > 0 && renderSearchResults()}
       </div>
     </div>
   );

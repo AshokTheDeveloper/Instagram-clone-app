@@ -6,6 +6,9 @@ CREATE TABLE
         email VARCHAR(250),
         password VARCHAR(250)
     )
+
+SELECT * FROM users WHERE username LIKE '%ash%';
+
 SELECT
     *
 FROM

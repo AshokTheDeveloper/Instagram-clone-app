@@ -18,6 +18,7 @@ const {
   likePost,
   likesCount,
   likeStatus,
+  searchUsers,
 } = require("../controllers/users.controllers");
 
 const authenticateUser = require("../middleware/authenticateUser");
@@ -39,5 +40,6 @@ router.post("/post/like", authenticateUser, likePost);
 router.post("/post/unlike", authenticateUser, likePost);
 router.get("/post/likes/:postId", authenticateUser, likesCount);
 router.get("/post/liked-status/:postId", authenticateUser, likeStatus);
+router.get("/search", authenticateUser, searchUsers);
 
 module.exports = router;

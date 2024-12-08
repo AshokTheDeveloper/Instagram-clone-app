@@ -111,36 +111,37 @@
   height: 100px;
   transform: translate(-50%, -50%);
   display: none;
-  opacity: 1;
-  animation: fadeOut 2s ease-in-out forwards, moveOut 2s ease forwards
+  animation: popAndTilt 1.3s ease-in-out forwards;
 }
 
 .liked-heart-image.show-heart {
   display: block;
-  animation: fadeOut 2s ease-in-out forwards, moveOut 2s ease forwards
 }
 
-@keyframes fadeOut {
+@keyframes popAndTilt {
   0% {
+    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(10deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -500%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(-50%, -500%) scale(1) rotate(0deg);
     opacity: 1;
   }
   100% {
-    opacity: 0;
-  }
-}
-
-@keyframes moveOut {
-  0% {
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -500%) scale(1) rotate(0deg);
     opacity: 1;
   }
-  100% {
-    transform: translate(-50%, -550%);
-    opacity: 0;
-  }
 }
 
-/* -----------------------------------------------------1 */
+/* ----------------------------------------------------- */
 
 .posts-post-image {
   max-width: 100%;

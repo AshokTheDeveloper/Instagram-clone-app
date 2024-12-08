@@ -225,9 +225,7 @@ const commentPost = async (req, res) => {
         (content, user_id, post_id)
       VALUES ('${content}', '${id}', '${postId}')
     `;
-    const dbComment = await db.run(commentPostQuery);
-    console.log(dbComment);
-
+    await db.run(commentPostQuery);
     return res.status(201).json({ message: "Comment created" });
   } catch (error) {
     console.log("Internal server error: ", error.message);
@@ -265,7 +263,6 @@ const getComments = async (req, res) => {
 };
 
 const likePost = async (req, res) => {
-  console.log("Like post");
   const { id } = req.user;
   const { postId } = req.body;
   try {
@@ -320,8 +317,7 @@ const UnlikePost = async (req, res) => {
         likes
       WHERE user_id = '${id}' AND post_id = '${postId}'`;
       const post = await db.run(UnlikePostQuery);
-      console.log("Post:", post);
-      return res.status(201).json({ message: "User removed" });
+      return res.status(201).json({ message: "Like removed" });
     }
   } catch (error) {
     console.log("Internal server error", error.message);
@@ -370,6 +366,26 @@ const likeStatus = async (req, res) => {
   }
 };
 
+const searchUsers = async (req, res) => {
+  const { query } = req.query;
+  console.log(query);
+  try {
+    const db = await dbPromise;
+    const searchUserQuery = `
+      SELECT id, username, fullname FROM users WHERE username LIKE '%${query}%'
+    `;
+    const queryResult = await db.all(searchUserQuery);
+    if (!queryResult) {
+      return res.status(401).json({ message: "Users not found" });
+    } else {
+      return res.status(200).json({ users: queryResult });
+    }
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -388,4 +404,5 @@ module.exports = {
   UnlikePost,
   likesCount,
   likeStatus,
+  searchUsers,
 };
