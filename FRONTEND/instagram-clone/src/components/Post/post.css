@@ -99,7 +99,48 @@
   margin-bottom: 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 3px;
+  position: relative;
 }
+
+/* Post heart animation */
+.liked-heart-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  display: none;
+  opacity: 1;
+  animation: fadeOut 2s ease-in-out forwards, moveOut 2s ease forwards
+}
+
+.liked-heart-image.show-heart {
+  display: block;
+  animation: fadeOut 2s ease-in-out forwards, moveOut 2s ease forwards
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes moveOut {
+  0% {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -550%);
+    opacity: 0;
+  }
+}
+
+/* -----------------------------------------------------1 */
 
 .posts-post-image {
   max-width: 100%;

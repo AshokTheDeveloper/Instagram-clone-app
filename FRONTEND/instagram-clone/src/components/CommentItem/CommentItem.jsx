@@ -6,7 +6,6 @@ import "./commentitem.css";
 const CommentItem = (props) => {
   const { commentDetails } = props;
   const { content, username, createdAt } = commentDetails;
-  console.log(commentDetails);
   const profile = username[0].toUpperCase();
 
   const convertToRelativeTime = (dateString) => {
@@ -15,7 +14,6 @@ const CommentItem = (props) => {
   };
 
   const convertedDate = convertToRelativeTime(createdAt);
-  console.log(convertedDate);
 
   return (
     <li className="comment-list-item">

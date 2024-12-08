@@ -19,6 +19,7 @@ const Post = (props) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
+  const [showHeart, setShowHeart] = useState(false);
 
   useEffect(() => {
     getLikesCount();
@@ -110,7 +111,7 @@ const Post = (props) => {
       const response = await fetch(apiUrl, options);
       const data = await response.json();
       if (response.ok) {
-        setHasLiked((prevState) => !prevState);
+        setHasLiked(true);
         setLikesCount((prevLikesCount) => prevLikesCount + 1);
       } else {
         console.log(data);
@@ -120,9 +121,19 @@ const Post = (props) => {
     }
   };
 
-  const onUnlikePostHandle = async () => {
-    console.log("clicked on unlike");
+  // Double tap post
+  const doubleTabToLikeHandle = () => {
+    if (!hasLiked) {
+      onLikePostHandle();
+    }
 
+    setShowHeart(true);
+    setTimeout(() => {
+      setShowHeart(false);
+    }, 500);
+  };
+
+  const onUnlikePostHandle = async () => {
     const unlikePost = {
       postId: id,
     };
@@ -232,12 +243,17 @@ const Post = (props) => {
           <BsThreeDots className="post-three-dots-icon" />
         </button>
       </div>
-      <div className="post-container">
+      <div className="post-container" onDoubleClick={doubleTabToLikeHandle}>
         <img src={imageUrl} alt="post image" className="posts-post-image" />
+        <img
+          src="https://res.cloudinary.com/dmui27xl3/image/upload/v1733627158/ICONS/Vector_heart_ptxfwe.png"
+          alt="heart_image"
+          className={`liked-heart-image ${showHeart ? "show-heart" : ""}`}
+        />
       </div>
       <div className="post-like-comment-share-icons-container">
         <div>
-          {/* {hasLiked ? (
+          {hasLiked ? (
             <button
               className="post-bottom-section-button"
               onClick={onUnlikePostHandle} // Like post handle
@@ -251,20 +267,7 @@ const Post = (props) => {
             >
               <GoHeart className="posts-icons" />
             </button>
-          )} */}
-
-          {
-            <button
-              className="post-bottom-section-button"
-              onClick={onLikePostHandle} // Unlike post handle
-            >
-              {hasLiked ? (
-                <GoHeartFill className="posts-icons liked-heart-icon" />
-              ) : (
-                <GoHeart className="posts-icons" />
-              )}
-            </button>
-          }
+          )}
 
           <button className="post-bottom-section-button">
             <FiMessageCircle className="posts-icons" />
