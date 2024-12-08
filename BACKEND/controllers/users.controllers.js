@@ -253,10 +253,10 @@ const getComments = async (req, res) => {
       FROM comment 
           JOIN users ON comment.user_id = users.id
       WHERE comment.post_id = '${postId}'`;
-    const comments = await db.get(getCommentsQuery);
-    // if (!comments) {
-    //   res.status(404).json({ message: "No comments found" });
-    // }
+    const comments = await db.all(getCommentsQuery);
+    if (!comments) {
+      return res.status(404).json({ message: "No comments found" });
+    }
     return res.status(200).json({ comments: comments });
   } catch (error) {
     console.log("Internal server error: ", error.message);
@@ -265,21 +265,64 @@ const getComments = async (req, res) => {
 };
 
 const likePost = async (req, res) => {
+  console.log("Like post");
   const { id } = req.user;
   const { postId } = req.body;
   try {
     const db = await dbPromise;
-    const likePostQuery = `
-    INSERT INTO
+    const findPostsLike = `
+    SELECT * FROM 
       likes
-        (user_id, post_id)
-    VALUES ('${id}', '${postId}')`;
-    const post = await db.run(likePostQuery);
+    WHERE 
+      user_id = '${id}' AND post_id = '${postId}'
+    `;
+    const isLikeExist = await db.get(findPostsLike);
+    if (!isLikeExist) {
+      const likePostQuery = `
+      INSERT INTO
+        likes
+          (user_id, post_id)
+      VALUES ('${id}', '${postId}')`;
+      const post = await db.run(likePostQuery);
+    } else {
+      const UnlikePostQuery = `
+      DELETE FROM
+        likes
+      WHERE user_id = '${id}' AND post_id = '${postId}'`;
+      const post = await db.run(UnlikePostQuery);
+    }
+
     if (post.lastID) {
       return res.status(201).json({ message: "Post liked" });
     }
 
     return res.status(201).json({ message: "Post liked" });
+  } catch (error) {
+    console.log("Internal server error", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const UnlikePost = async (req, res) => {
+  const { id } = req.user;
+  const { postId } = req.body;
+  try {
+    const db = await dbPromise;
+    const findPostsLike = `
+    SELECT * FROM 
+      likes
+    WHERE 
+      user_id = '${id}' AND post_id = '${postId}'
+    `;
+    if (findPostsLike) {
+      const UnlikePostQuery = `
+      DELETE FROM
+        likes
+      WHERE user_id = '${id}' AND post_id = '${postId}'`;
+      const post = await db.run(UnlikePostQuery);
+      console.log("Post:", post);
+      return res.status(201).json({ message: "User removed" });
+    }
   } catch (error) {
     console.log("Internal server error", error.message);
     return res.status(500).json({ message: "Internal server error" });
@@ -306,6 +349,27 @@ const likesCount = async (req, res) => {
   }
 };
 
+const likeStatus = async (req, res) => {
+  const { id } = req.user;
+  const { postId } = req.params;
+  try {
+    const db = await dbPromise;
+    const findLikedUserQuery = `
+    SELECT 1 AS is_liked FROM likes
+    WHERE user_id = '${id}' AND post_id = '${postId}'
+    `;
+    const isLiked = await db.get(findLikedUserQuery);
+    if (!isLiked) {
+      return res.status(200).json({ isLiked: false });
+    } else {
+      return res.status(200).json({ isLiked: true });
+    }
+  } catch (error) {
+    console.log("Internal server error: ", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -321,5 +385,7 @@ module.exports = {
   commentPost,
   getComments,
   likePost,
+  UnlikePost,
   likesCount,
+  likeStatus,
 };

@@ -17,6 +17,7 @@ const {
   userPosts,
   likePost,
   likesCount,
+  likeStatus,
 } = require("../controllers/users.controllers");
 
 const authenticateUser = require("../middleware/authenticateUser");
@@ -35,6 +36,8 @@ router.post("/follow-user", authenticateUser, followUser);
 router.post("/post/comment", authenticateUser, commentPost);
 router.get("/posts/comments/:postId", authenticateUser, getComments);
 router.post("/post/like", authenticateUser, likePost);
+router.post("/post/unlike", authenticateUser, likePost);
 router.get("/post/likes/:postId", authenticateUser, likesCount);
+router.get("/post/liked-status/:postId", authenticateUser, likeStatus);
 
 module.exports = router;

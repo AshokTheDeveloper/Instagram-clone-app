@@ -44,9 +44,8 @@ const Comments = (props) => {
       const response = await fetch(apiUrl, options);
       const data = await response.json();
       if (response.ok) {
-        if (data.comments !== undefined) {
+        if (data.comments.length !== 0) {
           convertToCamelCase(data.comments);
-          console.log(response.comments);
         }
       }
     } catch (error) {

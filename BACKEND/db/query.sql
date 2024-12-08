@@ -146,13 +146,24 @@ CREATE TABLE
         user_id INTEGER,
         post_id INTEGER,
         created_at DATETIME DEFAULT (DATETIME ('now', 'localtime')),
-        UNIQUE (post_id, user_id),
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
         FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE
     )
-
 INSERT INTO
     likes (user_id, post_id)
-VALUES (2, 3);
-SELECT COUNT(*) AS likes_count FROM likes WHERE user_id = 2;
-SELECT * FROM likes;
+VALUES
+    (2, 3);
+
+SELECT
+    COUNT(*) AS likes_count
+FROM
+    likes
+WHERE
+    user_id = 2;
+
+SELECT
+    *
+FROM
+    likes;
+
+-- DROP TABLE likes;

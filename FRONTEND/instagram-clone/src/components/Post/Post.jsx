@@ -24,6 +24,10 @@ const Post = (props) => {
     getLikesCount();
   }, []);
 
+  useEffect(() => {
+    getLikedStatus();
+  }, [id]);
+
   const onHandleComment = (event) => {
     setCommentInput(event.target.value);
   };
@@ -106,8 +110,41 @@ const Post = (props) => {
       const response = await fetch(apiUrl, options);
       const data = await response.json();
       if (response.ok) {
-        setHasLiked(true);
+        setHasLiked((prevState) => !prevState);
         setLikesCount((prevLikesCount) => prevLikesCount + 1);
+      } else {
+        console.log(data);
+      }
+    } catch (error) {
+      console.log("Response error: ", error.message);
+    }
+  };
+
+  const onUnlikePostHandle = async () => {
+    console.log("clicked on unlike");
+
+    const unlikePost = {
+      postId: id,
+    };
+
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = `http://localhost:3002/users/post/unlike`;
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(unlikePost),
+    };
+
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        setHasLiked(false);
+        setLikesCount((prevLikesCount) => prevLikesCount - 1);
       } else {
         console.log(data);
       }
@@ -143,7 +180,27 @@ const Post = (props) => {
     }
   };
 
-  // console.log(likesCount);
+  // Liked status
+  const getLikedStatus = async () => {
+    const jwtToken = Cookies.get("jwt_token");
+    const apiUrl = `http://localhost:3002/users/post/liked-status/${id}`;
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      credentials: "include",
+    };
+    try {
+      const response = await fetch(apiUrl, options);
+      const data = await response.json();
+      if (response.ok) {
+        setHasLiked(data.isLiked);
+      }
+    } catch (error) {
+      console.log("Error on liked status");
+    }
+  };
 
   const renderPost = () => (
     <li className="post-bg-container">
@@ -180,17 +237,35 @@ const Post = (props) => {
       </div>
       <div className="post-like-comment-share-icons-container">
         <div>
-          <button
-            className="post-bottom-section-button"
-            onClick={onLikePostHandle} // Like post handle
-          >
-            {hasLiked ? (
+          {/* {hasLiked ? (
+            <button
+              className="post-bottom-section-button"
+              onClick={onUnlikePostHandle} // Like post handle
+            >
               <GoHeartFill className="posts-icons liked-heart-icon" />
-
-            ) : (
+            </button>
+          ) : (
+            <button
+              className="post-bottom-section-button"
+              onClick={onLikePostHandle} // Unlike post handle
+            >
               <GoHeart className="posts-icons" />
-            )}
-          </button>
+            </button>
+          )} */}
+
+          {
+            <button
+              className="post-bottom-section-button"
+              onClick={onLikePostHandle} // Unlike post handle
+            >
+              {hasLiked ? (
+                <GoHeartFill className="posts-icons liked-heart-icon" />
+              ) : (
+                <GoHeart className="posts-icons" />
+              )}
+            </button>
+          }
+
           <button className="post-bottom-section-button">
             <FiMessageCircle className="posts-icons" />
           </button>
@@ -208,7 +283,9 @@ const Post = (props) => {
       </div>
       <div className="post-likes-count-container">
         {likesCount > 0 && ( // likes count
-          <p className="posts-likes-counter">{likesCount} likes</p>
+          <p className="posts-likes-counter">
+            {likesCount} {likesCount > 1 ? "likes" : "like"}
+          </p>
         )}
       </div>
       <div className="username-caption-container">
